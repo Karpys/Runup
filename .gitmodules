@@ -1,0 +1,3 @@
+[submodule "Runup/Assets/Scripts/KarpysUtils"]
+	path = Runup/Assets/Scripts/KarpysUtils
+	url = https://github.com/Karpys/KarpysUtils.git
