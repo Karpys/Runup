@@ -14,6 +14,7 @@ namespace KarpysDev.Runup
         [SerializeField] private TMP_Text m_DistanceTravelledBetweenTwoRefresh = null;
         [SerializeField] private TMP_Text m_LivePosition = null;
 
+        public Action<float> OnDistanceTravelled = null;
         private Loop m_AskUserPositionLoop = null;
 
         private float m_LastLatitude = 0;
@@ -26,16 +27,20 @@ namespace KarpysDev.Runup
         private void Update()
         {
             m_AskUserPositionLoop?.Update();
-            m_RefreshTime.text = "Refresh Time : " + m_AskUserPositionLoop?.LoopTimer;
+            
+            if(m_RefreshTime)
+                m_RefreshTime.text = "Refresh Time : " + m_AskUserPositionLoop?.LoopTimer;
             
             if (Input.location.status == LocationServiceStatus.Running)
             {
-                m_LivePosition.text = "Live Position : " + String.Concat("Latitude : ", Input.location.lastData.latitude
+                if(m_LivePosition)
+                    m_LivePosition.text = "Live Position : " + String.Concat("Latitude : ", Input.location.lastData.latitude
                     , " | ", "Longitude ", Input.location.lastData.longitude);
             }
             else
             {
-                m_UserPosition.text = "Wait for initialization";
+                if(m_UserPosition)
+                    m_UserPosition.text = "Wait for initialization";
             }
         }
 
@@ -51,16 +56,22 @@ namespace KarpysDev.Runup
             
             string location = String.Concat("Latitude : ", currentLatitude.ToString("F2"), " | ", "Longitude ",
                 currentLongitude.ToString("F2"));
-            m_UserPosition.text = "Position : " + location;
+            
+            if(m_UserPosition)
+                m_UserPosition.text = "Position : " + location;
 
             if (m_LastLatitude == 0 && m_LastLongitude == 0)
             {
-                m_DistanceTravelledBetweenTwoRefresh.text = "0";
+                if(m_DistanceTravelledBetweenTwoRefresh)
+                    m_DistanceTravelledBetweenTwoRefresh.text = "0";
             }
             else
             {
                 float distanceTravelledBetween = DistanceUtils.HaversineDistance(m_LastLatitude, m_LastLongitude, currentLatitude, currentLongitude);
-                m_DistanceTravelledBetweenTwoRefresh.text = distanceTravelledBetween.ToString("F2") + "m";
+                
+                if(m_DistanceTravelledBetweenTwoRefresh)
+                    m_DistanceTravelledBetweenTwoRefresh.text = distanceTravelledBetween.ToString("F2") + "m";
+                OnDistanceTravelled?.Invoke(distanceTravelledBetween);
             }
             
             m_LastLatitude = Input.location.lastData.latitude;
