@@ -8,7 +8,7 @@ namespace KarpysDev.Runup
         [SerializeField] private TMP_Text m_LocationStatus = null;
         private void Start()
         {
-            Input.location.Start();
+            Input.location.Start(1,1);
         }
 
         private void Update()

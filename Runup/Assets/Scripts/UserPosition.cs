@@ -17,8 +17,9 @@ namespace KarpysDev.Runup
         public Action<float> OnDistanceTravelled = null;
         private Loop m_AskUserPositionLoop = null;
 
-        private float m_LastLatitude = 0;
-        private float m_LastLongitude = 0;
+        private LocationInfo m_PreviousLocationInfo;
+        private LocationInfo m_CurrentLocationInfo;
+        
         private void Start()
         {
             m_AskUserPositionLoop = new Loop(m_UserPositionRate, AskPosition);
@@ -49,33 +50,31 @@ namespace KarpysDev.Runup
             if (Input.location.status != LocationServiceStatus.Running)
             {
                 return;
-            }
-
-            float currentLatitude = Input.location.lastData.latitude;
-            float currentLongitude = Input.location.lastData.longitude;
-            
-            string location = String.Concat("Latitude : ", currentLatitude.ToString("F2"), " | ", "Longitude ",
-                currentLongitude.ToString("F2"));
-            
-            if(m_UserPosition)
-                m_UserPosition.text = "Position : " + location;
-
-            if (m_LastLatitude == 0 && m_LastLongitude == 0)
+            }else if (m_PreviousLocationInfo.longitude == 0)
             {
-                if(m_DistanceTravelledBetweenTwoRefresh)
-                    m_DistanceTravelledBetweenTwoRefresh.text = "0";
+                m_PreviousLocationInfo = Input.location.lastData;
             }
-            else
+            
+            m_CurrentLocationInfo = Input.location.lastData;
+
+            float distanceTravelledBetween = DistanceUtils.GetDistanceInMeters(m_PreviousLocationInfo,m_CurrentLocationInfo);
+
+
+            if (CanSaveDistance(distanceTravelledBetween))
             {
-                float distanceTravelledBetween = DistanceUtils.HaversineDistance(m_LastLatitude, m_LastLongitude, currentLatitude, currentLongitude);
-                
                 if(m_DistanceTravelledBetweenTwoRefresh)
                     m_DistanceTravelledBetweenTwoRefresh.text = distanceTravelledBetween.ToString("F2") + "m";
                 OnDistanceTravelled?.Invoke(distanceTravelledBetween);
+                m_PreviousLocationInfo = Input.location.lastData;
             }
-            
-            m_LastLatitude = Input.location.lastData.latitude;
-            m_LastLongitude = Input.location.lastData.longitude;
+        }
+
+        private bool CanSaveDistance(float distanceTravelled)
+        {
+            if(distanceTravelled < 3)
+                return false;
+
+            return true;
         }
     }
 }

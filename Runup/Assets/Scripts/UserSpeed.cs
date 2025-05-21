@@ -6,9 +6,10 @@ namespace KarpysDev.Runup
 
     public class UserSpeed : MonoBehaviour
     {
-        [SerializeField] private TMP_Text m_DistanceTravelledText = null;
+        [SerializeField] private TMP_Text m_TotalDistanceTravelledText = null;
         [SerializeField] private TMP_Text m_TimeText = null;
         [SerializeField] private TMP_Text m_SpeedText = null;
+        [SerializeField] private TMP_Text m_DistanceTravelledBetween = null;
         [SerializeField] private UserPosition m_UserPosition = null;
 
         private float m_StartTime = 0;
@@ -36,11 +37,15 @@ namespace KarpysDev.Runup
         {
             if(!m_InRecord)
                 return;
+
+            m_DistanceTravelledBetween.text = "Distance Between :" + distance + "m";
             m_TotalDistance += distance;
 
-            m_DistanceTravelledText.text = "Distance : " + m_TotalDistance + "m";
+            m_TotalDistanceTravelledText.text = "Distance : " + m_TotalDistance + "m";
             m_TimeText.text = "Time : " + (Time.time - m_StartTime) + " sec";
-            m_SpeedText.text = "Speed : " + (m_TotalDistance / (Time.time - m_StartTime) / 3.6f) + " km/h";
+
+            float meterPerSec = m_TotalDistance / (Time.time - m_StartTime);
+            m_SpeedText.text = "Speed : " + meterPerSec * 3.6f + " km/h";
         }
     }
 }
